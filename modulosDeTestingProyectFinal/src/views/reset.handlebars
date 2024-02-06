@@ -1,0 +1,39 @@
+<main>
+  <section class="login-section">
+    <div class="container">
+      <div class="title-container">
+        <h1 class="title">Crea tu nueva contraseña</h1>
+      </div>
+
+      <div>
+        <form action="/api/sessions/reset" method="post" class="form">
+          <div class="form-field">
+            <label for="email" class="form-field_label">Correo electrónico:</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Ingresa tu correo electrónico"
+              required
+              class="form-field_input"
+            />
+          </div>
+
+          <div class="form-field">
+            <label for="password" class="form-field_label">Nueva contraseña:</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Ingresa tu contraseña"
+              required
+              class="form-field_input"
+            />
+          </div>
+          <div class="btn-container">
+            <button type="submit" class="submit-btn">Guardar</button>
+          </div>
+
+    </div>
+  </section>
+</main>

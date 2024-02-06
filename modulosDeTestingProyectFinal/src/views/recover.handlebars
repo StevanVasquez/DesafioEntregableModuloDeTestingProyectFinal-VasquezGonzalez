@@ -1,0 +1,30 @@
+<main>
+  <section class="login-section">
+    <div class="container">
+
+      <div class="title-container">
+        <h1 class="title">RECUPERACIÓN DE CONTRASEÑA</h1>
+      </div>
+      <form action="/api/sessions/recover" method="post" class="form">
+        <div class="text-container">
+          <p>Ingresa tu correo electrónico y te enviaremos un link para que reestablezcas tu contraseña.</p>
+        </div>
+        <div class="form-field">
+          <label for="email" class="form-field_label">Correo electrónico:</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Ingresa tu correo electrónico"
+            required
+            class="form-field_input"
+          />
+        </div>
+        <div class="btn-container">
+          <button type="submit" class="submit-btn">Recibir email para
+            reestablecer contraseña</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>

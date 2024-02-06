@@ -1,0 +1,426 @@
+paths:
+  /api/carts:
+    get:
+      summary: Returns all existing carts in data base.
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: Existing carts in data base.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Cart"
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/getCarts"
+    post:
+      summary: Creates a cart.
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: Cart created.
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/createCart"
+  /api/carts/{cid}:
+    get:
+      summary: Returns a cart by id.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+      responses:
+        "200":
+          description: Cart info.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Cart"
+        "404":
+          description: Error - Cart not found.
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/getCartById"
+    put:
+      summary: Updates a cart by id.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+      requestBody:
+        description: Updates a cart in the data base.
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/updateCart"
+      responses:
+        "200":
+          description: Updated cart.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Cart/UpdatedCart"
+        "404":
+          description: Error - Cart not found.
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/updateCartById"
+    delete:
+      summary: Deletes a cart by id.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+      responses:
+        "200":
+          description: Cart deleted.
+        "404":
+          description: Error - Cart not found.
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/deleteCartById"
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Confirms purchase of products in cart by id.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId.
+      responses:
+        "200":
+          description: Purchase successfully completed.
+        "400":
+          description: Not enough stock of product.
+        "404":
+          description: Error - Cart not found. || Cart is empty. || Product is not in stock.
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/purchaseProducts"
+  /api/carts/{cid}/products/{pid}:
+    post:
+      summary: Adds a product to a cart by id.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+        - name: pid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+      requestBody:
+        description: Update a product in a cart.
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/updateProduct"
+      responses:
+        "200":
+          description: Product quantity updated. || Product added to cart.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Cart"
+        "404":
+          description: Error - Product not found. || Cart not found.
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/addProductToCart"
+    put:
+      summary: Updates a product in the cart by id.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+        - name: pid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+      requestBody:
+        description: Update a product in a cart.
+        content:
+          application/json:
+            schema:
+              $ref: "#components/requestBodies/updateProductInCart"
+      responses:
+        "200":
+          description: Product from cart successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Cart/UpdatedProductInCart"
+        "400":
+          description: Only title, description, code, price, status, stock and category can be modified.
+        "404":
+          description: Error - Cart not found. || Product does not exist in cart.
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/updateProductFromCart"
+    delete:
+      summary: Deletes a product from a cart by id.
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+        - name: pid
+          in: path
+          required: true
+          description: Cart id.
+          schema:
+            $type: ObjectId
+      responses:
+        "200":
+          description: Product quantity updated. || Product deleted from cart.
+        "404":
+          description: Error - Product does not exist in cart.
+        "500":
+          description: Server side error.
+          content:
+            application/json:
+              schema:
+                $ref: "#components/CartServerError/deleteProductFromCart"
+
+components:
+  schemas:
+    Cart:
+      type: object
+      description: Cart schema.
+      properties:
+        _id:
+          type: ObjectId
+          description: Id generated by mongo.
+        products:
+          type: array
+          description: Array of existing products in cart.
+      example:
+        _id: 64dcd2cbf32653bce70070bf
+        products: [{ product: 64d64e95f0a8421ee857819d, quantity: 1 }]
+      UpdatedCart:
+        type: object
+        description: Updated cart schema.
+        properties:
+          _id:
+            type: ObjectId
+            description: Id generated by mongo.
+          products:
+            type: array
+            description: Array of existing products in cart.
+        example:
+          _id: 64dcd2cbf32653bce70070bf
+          products:
+            [
+              { product: 64d64e95f0a8421ee857819d, quantity: 1 },
+              { product: 64dbafcd2052584634915ab3, quantity: 2 },
+            ]
+      UpdatedProductInCart:
+        type: object
+        description: Updated product in cart schema.
+        properties:
+          _id:
+            type: ObjectId
+            description: Id generated by mongo.
+          products:
+            type: array
+            description: Array of existing products in cart.
+        example:
+          _id: 64dcd2cbf32653bce70070bf
+          products:
+            [
+              { product: 64dbafcd2052584634915ab3, quantity: 2 },
+              { product: 64d64e95f0a8421ee857819d, quantity: 10 },
+            ]
+  CartServerError:
+    getCarts:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error getting all carts.
+    createCart:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error creating a cart.
+    getCartById:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error getting a cart.
+    updateCartById:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error updating a cart.
+    deleteCartById:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error deleting a cart.
+    purchaseProducts:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error purchasing products.
+    addProductToCart:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error adding a product to the cart.
+    updateProductFromCart:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error updating a product from the cart.
+    deleteProductFromCart:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: Status code 500
+        message:
+          type: string
+          description: Description of the server side error
+      example:
+        status: 500
+        message: There was an error deleting a product from the cart.
+  requestBodies:
+    updateCart:
+      type: object
+      example:
+        products:
+          [
+            { product: 64d64e95f0a8421ee857819d, quantity: 1 },
+            { product: 64dbafcd2052584634915ab3, quantity: 2 },
+          ]
+    addProductToCart:
+      type: object
+      example:
+        _id: ObjectId
+        products:
+
+    updateProductFromCart:
